@@ -171,4 +171,4 @@ cython_debug/
 .pypirc
 
 # environments
-/.env
+/CampusCraft/.env
