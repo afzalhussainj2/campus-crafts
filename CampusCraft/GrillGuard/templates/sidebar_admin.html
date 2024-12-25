@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Grill Guard</title>
+    {% load static %}
+    {% block style %} {% endblock %}
+    <link rel="stylesheet" href="{% static 'assets/styles/sidebar.css' %}" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <div class="container">
+      <!-- Sidebar -->
+      <aside class="sidebar">
+        <div class="profile-section">
+          <p class="profile-text">{{user.name}}</p>
+          <div class="img-cont">
+            <span class="material-symbols-outlined profile-icon">person</span>
+          </div>
+        </div>
+        <button class="material-symbols-outlined hamburg">menu</button>
+        <ul class="menu">
+          <li>
+            <a
+              class="sidebar-button"
+              href="{% url 'dashboard_admin' %}"
+              class="active"
+            >
+              <span class="material-symbols-outlined sidebar-button-icon"
+                >dashboard</span
+              >
+              Dashboard</a
+            >
+          </li>
+          <li>
+            <a class="sidebar-button" href="{% url 'seller_management' %}"
+              ><span class="material-symbols-outlined sidebar-button-icon"
+                >man</span
+              >Sellers</a
+            >
+          </li>
+          <li>
+            <a class="sidebar-button" href="{% url 'complain_admin' %}"
+              ><span class="material-symbols-outlined sidebar-button-icon"
+                >description</span
+              >Complains</a
+            >
+          </li>
+        </ul>
+        <a href="{% url 'logout' %}" class="logout">
+          <span class="material-symbols-outlined logout-icon">logout</span>Log
+          out</a
+        >
+      </aside>
+      <div class="menu2">
+        <ul class="menu2sub">
+          <li>
+            <a
+              class="sidebar-button"
+              href="{% url 'dashboard_admin' %}"
+              class="active"
+            >
+              <span class="material-symbols-outlined sidebar-button-icon"
+                >dashboard</span
+              >
+              Dashboard</a
+            >
+          </li>
+          <li>
+            <a class="sidebar-button" href="{% url 'seller_management' %}"
+              ><span class="material-symbols-outlined sidebar-button-icon"
+                >man</span
+              >Sellers</a
+            >
+          </li>
+          <li>
+            <a class="sidebar-button" href="{% url 'complain_admin' %}"
+              ><span class="material-symbols-outlined sidebar-button-icon"
+                >description</span
+              >Complains</a
+            >
+          </li>
+        </ul>
+        <a href="{% url 'logout' %}" class="logout">
+          <span class="material-symbols-outlined logout-icon">logout</span>Log
+          out</a
+        >
+      </div>
+      {% block main-content %} {% endblock %} {% block bill %} {% endblock %}
+      <input
+        type="hidden"
+        name="csrfmiddlewaretoken"
+        value="{{ csrf_token }}"
+      />
+    </div>
+    <script>
+      document.querySelector(".hamburg").addEventListener("click", () => {
+        if (document.querySelector(".sidebar").classList.contains("active")) {
+          document.querySelector(".sidebar").classList.toggle("inactive");
+          document.querySelector(".menu2").style.display = "none";
+          mainContent.style.display = "block";
+        } else {
+          document.querySelector(".sidebar").classList.toggle("active");
+          document.querySelector(".menu2").style.display = "block";
+          document.querySelector(".menu2").style.transform = "translateX(0px)";
+          document.querySelector(".main-content").style.display = "none";
+        }
+      });
+    </script>
+    {% block script %} {% endblock %}
+  </body>
+</html>

@@ -1,0 +1,109 @@
+{% extends 'sidebar_seller.html' %} {% load static %} {% block style %}<link
+  rel="stylesheet"
+  href="{% static 'assets/styles/complain_seller.css' %}"
+/>
+{% endblock %} {% block main-content %}
+
+<main>
+  <div class="complains-container">
+    <!-- Header -->
+    <header class="complains-header">
+      <div class="summary">
+        <h2><span>{{total_complains}}</span></h2>
+        <p>Total Complaints</p>
+      </div>
+      <div class="summary">
+        <h2><span>{{approved_complains}}</span></h2>
+        <p>Approved</p>
+      </div>
+    </header>
+
+    <!-- Complaints Table -->
+    <section class="complaints-table">
+      <div class="table-header">
+        <div class="table-header-name">COMPLAINTS</div>
+        <div class="table-header-status">STATUS</div>
+      </div>
+      {% for complaint in complains %}
+      <div class="table-row" onclick="showPopup('{{ complaint.complaint }}', '{{ complaint.status }}')">
+        <div class="complain-text">{{ complaint.complain }}</div>
+        <button class="status-button {{ complaint.status|lower }}">{{ complaint.status }}</button>
+      </div>
+      {% endfor %}
+    </section>
+  </div>
+  <div style="display: none;" class="user-logged">{{user.email}}</div>
+</main>
+
+<!-- Pop-up for Complaint Details -->
+<div id="complaint-popup" class="popup hidden">
+  <div class="popup-content">
+    <span id="close-popup" onclick="closePopup()">✖</span>
+    <h3>Complaint Details</h3>
+    <p id="complaint-text"></p>
+    <p><strong>Status:</strong> <span id="complaint-status"></span></p>
+  </div>
+</div>
+{% endblock %} {% block script %}
+<!-- Script -->
+<script>
+  function showPopup(complaint, status) {
+    document.getElementById("complaint-popup").classList.remove("hidden");
+    document.getElementById("complaint-text").innerText = complaint;
+    document.getElementById("complaint-status").innerText = status;
+  }
+
+  function closePopup() {
+    document.getElementById("complaint-popup").classList.add("hidden");
+  }
+
+  document.querySelector('.complain-submit-btn').addEventListener('click', async (event) => {
+    event.preventDefault(); // Prevent the default form submission behavior
+
+    const sellerSelect = document.getElementById('seller-select');
+    const complaintTextarea = document.getElementById('complaint');
+    const userElement = document.querySelector('.user-logged'); // Get the username from the Django template
+    const userEmail = userElement.textContent;
+    // Retrieve values from the form
+    const sellerName = sellerSelect.value;
+    const complaintText = complaintTextarea.value;
+
+    // Validate the input
+    if (!sellerName || !complaintText) {
+        alert("Please fill in all fields.");
+        return;
+    }
+
+    try {
+        // Send the data to the backend via fetch
+        const response = await fetch("{% url 'save_complain' %}", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token }}', // Django CSRF token for protection
+            },
+            body: JSON.stringify({
+                seller: sellerName,
+                complaint: complaintText,
+                user_email: userEmail,
+            }),
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+            alert("Complaint submitted successfully!");
+            // Optionally clear the form
+            sellerSelect.value = "";
+            complaintTextarea.value = "";
+        } else {
+            alert("Failed to submit complaint. Please try again.");
+        }
+    } catch (error) {
+        console.error("Error submitting complaint:", error);
+        alert("An error occurred. Please try again later.");
+    }
+});
+
+
+</script>
+{% endblock %}

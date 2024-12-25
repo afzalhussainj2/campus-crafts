@@ -1,0 +1,481 @@
+{% extends 'sidebar_admin.html' %} {% load static %} {% block style %}<link
+  rel="stylesheet"
+  href="{% static 'assets/styles/dashboard_admin.css' %}"
+/>
+{% endblock %} {% block main-content %}
+
+<!-- main content -->
+<div class="main-content">
+  <div class="table-container">
+    <!-- search-bar -->
+    <div class="search-bar-cont">
+      <span class="material-symbols-outlined search-item-icon">search</span>
+      <input
+        type="text"
+        placeholder=" Search"
+        class="search-bar"
+        onkeyup="searchTable()"
+      />
+    </div>
+    <!-- table -->
+    <div style="position: relative" class="table-head">
+      <h3 style="width: 120px">Items</h3>
+      <h3 style="width: 136px">Price</h3>
+      <button
+        onclick="newproductVisible(this)"
+        class="bill-btn"
+        style="position: absolute; right: 5px"
+      >
+        Add New
+      </button>
+    </div>
+    <div class="items-table" id="itemsTable">
+      {% for item in products %}
+      <div class="items-table-row">
+        <div class="item-name">{{item.name}}</div>
+        <div class="item-price" style="width: 134px">Rs.{{item.price}}</div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+  <div class="right-cont">
+    <!-- search-bar -->
+    <div class="search-bar-cont" style="margin-bottom: 0px; margin-top: 10px">
+      <span class="material-symbols-outlined search-item-icon">search</span>
+      <input
+        type="text"
+        placeholder=" Search"
+        class="search-bar search-bar-bill"
+        onkeyup="searchBill()"
+      />
+    </div>
+    <div class="bill">
+      <div id="bill-contain">
+        <div class="bill-head" style="justify-content: space-evenly">
+          <h3 style="width: 30px">Sr.</h3>
+          <h3 style="width: 94px; text-align: center">Bill no.</h3>
+          <h3 style="width: 90px; text-align: center">Details</h3>
+          <h3 style="width: 138px; text-align: center">Waiter</h3>
+          <h3 style="width: 50px; text-align: center">Table</h3>
+        </div>
+        {% for bill in bills %}
+        <div class="items-table-row" style="justify-content: space-evenly">
+          <div style="width: 30px">{{forloop.counter}}</div>
+          <div style="width: 94px; text-align: center" class="bill-num">
+            {{bill.bill_number}}
+          </div>
+          <button class="bill-btn bill-detail" onclick="billVisible(this)">
+            Show Bill
+          </button>
+          <div
+            class="bill-table-waiter-name"
+            style="width: 138px; text-align: center"
+          >
+            {{bill.waiter}}
+          </div>
+          <div
+            class="bill-table-table-num"
+            style="width: 50px; text-align: center"
+          >
+            {{bill.table}}
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %} {% block bill %}
+<!-- bill -->
+<div class="bill-container">
+  <h1 class="bill-cont-bill-num">bill number</h1>
+  <h3>
+    <span class="bill-cont-waiter-name">waiter</span> (<span
+      class="bill-cont-table-num"
+      >table</span
+    >)
+  </h3>
+  <table>
+    <thead>
+      <tr>
+        <th>Item</th>
+        <th>Quantity</th>
+        <th>Price</th>
+        <th>Total</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr class="bill-row">
+        <td class="bill-item-name">Coke</td>
+        <td class="bill-item-qnt">3</td>
+        <td class="bill-item-price">$2.00</td>
+        <td class="bill-item-price-total">$6.00</td>
+      </tr>
+    </tbody>
+    <tfoot>
+      <tr>
+        <td colspan="3" class="total">Total</td>
+        <td class="totalp">$41.80</td>
+      </tr>
+    </tfoot>
+  </table>
+</div>
+
+<div
+  style="
+    max-width: 500px;
+    background: #fff;
+    padding: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    border-radius: 10px;
+    position: absolute;
+    top: 25%;
+    left: 40%;
+    display: none;
+  "
+  class="new_product_container"
+>
+  <input type="text" class="search-bar new_product_name" placeholder="Name" />
+  <input type="number" class="search-bar new_product_price" placeholder="Price" min="1" />
+  <button style="margin-top: 10px;" class="bill-btn new_product_btn">Submit</button>
+</div>
+
+{% endblock %} {% block script %}
+<script id="bill-data" type="application/json">
+  {{ bills_json|safe }}
+</script>
+<script id="order-data" type="application/json">
+  {{ orders_json|safe }}
+</script>
+<script id="products-data" type="application/json">
+  {{ products_json|safe }}
+</script>
+<script id="waiters-data" type="application/json">
+  {{ waiter_json|safe }}
+</script>
+
+<script>
+  const waiter = document.querySelector(".waiter-item");
+  const table = document.querySelector(".table-item");
+  let row = null;
+
+  searchTable = () => {
+    const input = document.querySelector(".search-bar");
+    const filter = input.value.toUpperCase();
+    const itemsTable = document.getElementById("itemsTable");
+    const productsDataScript = document.getElementById("products-data");
+
+    if (!productsDataScript || !productsDataScript.textContent) {
+      return; // Stop execution if no data
+    }
+
+    const productsData = JSON.parse(productsDataScript.textContent);
+
+    if (!input.value) {
+      itemsTable.innerHTML = "";
+      productsData.forEach((item) => {
+        const itemRow = document.createElement("div");
+        itemRow.classList.add("items-table-row");
+        itemRow.innerHTML = `
+        <div class="item-name">${item.name}</div>
+        <div class="item-price" style="width: 134px">Rs.${item.price}</div>
+      `;
+        itemsTable.appendChild(itemRow);
+      });
+      return;
+    }
+    const items = productsData.filter((product) =>
+      product.name.toUpperCase().includes(filter)
+    );
+    itemsTable.innerHTML = "";
+    items.forEach((item) => {
+      const itemRow = document.createElement("div");
+      itemRow.classList.add("items-table-row");
+      itemRow.innerHTML = `
+        <div class="item-name">${item.name}</div>
+        <div class="item-price" style="width: 134px">Rs.${item.price}</div>
+      `;
+      itemsTable.appendChild(itemRow);
+    });
+  };
+
+  searchBill = () => {
+    const input = document.querySelector(".search-bar-bill");
+    const filter = input.value.toUpperCase();
+    const billTable = document.getElementById("bill-contain");
+    const billsDataScript = document.getElementById("bill-data");
+
+    if (!billsDataScript || !billsDataScript.textContent) {
+      return; // Stop execution if no data
+    }
+
+    const billsData = JSON.parse(billsDataScript.textContent);
+
+    if (!input.value) {
+      billTable.innerHTML = ``;
+      billTable.innerHTML = `<div class="bill-head" style="justify-content: space-evenly">
+          <h3 style="width: 30px">Sr.</h3>
+          <h3 style="width: 94px; text-align: center">Bill no.</h3>
+          <h3 style="width: 90px; text-align: center">Details</h3>
+          <h3 style="width: 138px; text-align: center">Waiter</h3>
+          <h3 style="width: 50px; text-align: center">Table</h3>
+        </div>`;
+      let i = 1;
+      billsData.forEach((item) => {
+        const itemRow = document.createElement("div");
+        itemRow.classList.add("items-table-row");
+        itemRow.innerHTML = `
+        <div style="width: 30px">${i}</div>
+          <div style="width: 94px; text-align: center" class="bill-num">
+            ${item.bill_number}
+          </div>
+          <button class="bill-btn bill-detail" onclick="billVisible(this)">
+            Show Bill
+          </button>
+          <div
+            class="bill-table-waiter-name"
+            style="width: 138px; text-align: center"
+          >
+            ${item.waiter}
+          </div>
+          <div
+            class="bill-table-table-num"
+            style="width: 50px; text-align: center"
+          >
+            ${item.table}
+          </div>
+      `;
+        billTable.appendChild(itemRow);
+        i++;
+      });
+      return;
+    }
+    const items = billsData.filter((bill) =>
+      bill.bill_number.toUpperCase().includes(filter)
+    );
+
+    billTable.innerHTML = ``;
+    billTable.innerHTML = `<div class="bill-head" style="justify-content: space-evenly">
+          <h3 style="width: 30px">Sr.</h3>
+          <h3 style="width: 94px; text-align: center">Bill no.</h3>
+          <h3 style="width: 90px; text-align: center">Details</h3>
+          <h3 style="width: 138px; text-align: center">Waiter</h3>
+          <h3 style="width: 50px; text-align: center">Table</h3>
+        </div>`;
+    let i = 1;
+    items.forEach((item) => {
+      const itemRow = document.createElement("div");
+      itemRow.classList.add("items-table-row");
+      itemRow.innerHTML = `
+        <div style="width: 30px">${i}</div>
+          <div style="width: 94px; text-align: center" class="bill-num">
+            ${item.bill_number}
+          </div>
+          <button class="bill-btn bill-detail" onclick="billVisible(this)">
+            Show Bill
+          </button>
+          <div
+            class="bill-table-waiter-name"
+            style="width: 138px; text-align: center"
+          >
+            ${item.waiter}
+          </div>
+          <div
+            class="bill-table-table-num"
+            style="width: 50px; text-align: center"
+          >
+            ${item.table}
+          </div>
+      `;
+      billTable.appendChild(itemRow);
+      i++;
+    });
+  };
+
+  function billVisible(button) {
+    const billNumber =
+      button.parentElement.querySelector(".bill-num").textContent; // Get the bill number
+    const waitername = button.parentElement.querySelector(
+      ".bill-table-waiter-name"
+    ).textContent;
+    const tablenum = button.parentElement.querySelector(
+      ".bill-table-table-num"
+    ).textContent;
+    const billContainer = document.querySelector(".bill-container");
+    const totalElement = document.querySelector(".totalp");
+    const billDataScript = document.getElementById("bill-data");
+    const orderDataScript = document.getElementById("order-data");
+    const productsDataScript = document.getElementById("products-data");
+    const billheadingbillnum = document.querySelector(".bill-cont-bill-num");
+    const billheadingwaitername = document.querySelector(
+      ".bill-cont-waiter-name"
+    );
+    const billheadingtablenum = document.querySelector(".bill-cont-table-num");
+    // Check if the scripts contain the necessary data
+    if (
+      !billDataScript ||
+      !billDataScript.textContent ||
+      !orderDataScript ||
+      !orderDataScript.textContent
+    ) {
+      return; // Stop execution if no data is available
+    }
+
+    billheadingbillnum.textContent = `#${billNumber.trim()}`;
+    billheadingbillnum.style.fontweight = "bold";
+    billheadingwaitername.textContent = waitername;
+    billheadingtablenum.textContent = tablenum;
+
+    // Parse the data from the scripts
+    const billData = JSON.parse(billDataScript.textContent);
+    const orderData = JSON.parse(orderDataScript.textContent);
+    const productsrData = JSON.parse(productsDataScript.textContent);
+    bill = billData.find((bill) => bill.bill_number === billNumber.trim());
+    // Find the bill data by bill number
+    const totalPriceData = bill;
+
+    // Update the total price display
+    totalElement.textContent = `Rs. ${totalPriceData.total}`;
+
+    // Clear any existing items in the bill container
+    const billTableBody = billContainer.querySelector("tbody");
+    billTableBody.innerHTML = ""; // Clear existing rows
+    // Filter orders for this specific bill number
+
+    const ordersForBill = orderData.filter(
+      (order) => order.bill__bill_number === billNumber.trim()
+    );
+    // Loop through orders and create rows for the bill
+    ordersForBill.forEach((order) => {
+      const row = document.createElement("tr");
+      row.classList.add("bill-row");
+
+      // Create table cells for each order item
+      const itemNameCell = document.createElement("td");
+      itemNameCell.classList.add("bill-item-name");
+      itemNameCell.textContent = order.product__name; // Product name from order
+      itemNameCell.style.width = "200px";
+
+      const quantityCell = document.createElement("td");
+      quantityCell.classList.add("bill-item-qnt");
+      quantityCell.textContent = order.quantity; // Quantity from order
+
+      const priceCell = document.createElement("td");
+      priceCell.classList.add("bill-item-price");
+      const itempriceproductobj = productsrData.find(
+        (product) => product.name === order.product__name
+      );
+      priceCell.textContent = `Rs.${itempriceproductobj.price.toFixed(2)}`; // Price of the item
+
+      const totalCell = document.createElement("td");
+      totalCell.classList.add("bill-item-price-total");
+      totalCell.textContent = `Rs.${(
+        itempriceproductobj.price * order.quantity
+      ).toFixed(2)}`; // Total price per product
+
+      // Append the cells to the row
+      row.appendChild(itemNameCell);
+      row.appendChild(quantityCell);
+      row.appendChild(priceCell);
+      row.appendChild(totalCell);
+
+      // Append the row to the bill table body
+      billTableBody.appendChild(row);
+
+      // Remove any existing outside click listener to avoid duplicates
+      document.removeEventListener("click", outsideClickListener);
+
+      // Add the outside click listener
+      document.addEventListener("click", outsideClickListener);
+
+      // Define the outside click listener function
+      function outsideClickListener(event) {
+        if (
+          !billContainer.contains(event.target) &&
+          !button.contains(event.target)
+        ) {
+          billContainer.style.display = "none";
+          document.removeEventListener("click", outsideClickListener); // Remove the listener after hiding the bill
+        }
+      }
+    });
+
+    // Show the bill container
+    billContainer.style.display = "block";
+  }
+
+  function newproductVisible(button) {
+    const itemContainer = document.querySelector(".new_product_container");
+
+    // Remove any existing outside click listener to avoid duplicates
+    document.removeEventListener("click", outsideClickListener);
+
+    // Add the outside click listener
+    document.addEventListener("click", outsideClickListener);
+
+    // Define the outside click listener function
+    function outsideClickListener(event) {
+      if (
+        !itemContainer.contains(event.target) &&
+        !button.contains(event.target)
+      ) {
+        itemContainer.style.display = "none";
+        document.removeEventListener("click", outsideClickListener); // Remove the listener after hiding the bill
+      }
+    }
+
+    // Show the bill container
+    itemContainer.style.display = "block";
+  }
+
+  document
+    .querySelector(".new_product_btn")
+    .addEventListener("click", function () {
+      // Get the product name
+      const productName = document.querySelector(".new_product_name").value.trim();
+
+      // Get the price
+      const price = parseInt(document.querySelector(".new_product_price").value);
+
+      // If any of the fields are missing, alert the user
+      if (!productName || !price) {
+        alert("Please select all fields!");
+        return;
+      }
+
+      // Prepare the data object for the request
+      const data = {
+        product: productName,
+        price: price,
+      };
+
+      csrfTokenElement = document.querySelector("[name=csrfmiddlewaretoken]");
+
+      // Send the data to the backend using Fetch
+      fetch("/save-product/", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-CSRFToken": csrfTokenElement.value,
+        },
+        body: JSON.stringify(data),
+      })
+        .then((response) => response.json())
+        .then((result) => {
+          if (result.success) {
+            alert("Order saved successfully!");
+          } else {
+            alert("Failed to save order!");
+          }
+        });
+
+      // Hide content after successful submission
+      const newproductContainer = document.querySelector(".new_product_container");
+      newproductContainer.style.display = "none";
+
+      window.location.reload();
+    });
+
+
+</script>
+{% endblock %}

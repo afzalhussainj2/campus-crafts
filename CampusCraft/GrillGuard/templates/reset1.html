@@ -1,0 +1,19 @@
+{% extends 'basic-login.html' %} {% block form-section %}
+
+<form class="flex-form" style="justify-content: center" method="post" action="{% url 'otpsend' %}">
+  {% csrf_token %}
+  <p class="heading" style="margin-bottom: 10px">Reset your password</p>
+  <p class="msg" style="margin-bottom: 92px">
+    Enter the field below to get started
+  </p>
+  <label for="email" style="margin-bottom: 10px">Email*</label>
+  <input
+    style="margin-bottom: 10px"
+    type="email"
+    id="email"
+    name="email"
+    required
+  />
+  <button style="margin-bottom: 10px" type="submit">Send OTP</button>
+</form>
+{% endblock %} 

@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Grill Guard</title>
+
+    {% load static %}
+
+    <link
+      rel="stylesheet"
+      href="{% static 'assets/styles/basic-login.css' %}"
+    />
+    <style>
+      @font-face {
+        font-family: "Oswald";
+        src: url("{% static 'assets/fonts/Oswald.ttf' %}");
+      }
+
+      @font-face {
+        font-family: "ribeye";
+        src: url("{% static 'assets/fonts/Ribeye-Regular.ttf'%}");
+      }
+      @font-face {
+        font-family: "Roboto";
+        src: url("{% static 'assets/fonts/Roboto-Regular.ttf' %}");
+      }
+    </style>
+  </head>
+  <body>
+    <div class="parent">
+      <div class="welcome-section">
+        <div class="welcome-flex">
+          <p class="welcome-msg">Welcome to Grill Guard</p>
+          <div class="img-cont">
+            <img
+              src="{% static 'assets/images/logo.png' %}"
+              height="100%"
+              width="100%"
+              alt=""
+            />
+          </div>
+          <p class="slogan">No More Guesswork - Just Accurate Billing!</p>
+        </div>
+      </div>
+      <div class="form-section">
+        <!-- Displaying error messages -->
+
+        {% if messages %}
+        <ul style="color: brown">
+          {% for message in messages %}
+          <li>
+            {% if message.tags %}{{ message.tags }}:{% endif %} {{ message }}
+          </li>
+          {% endfor %}
+        </ul>
+        {% endif %} {% block form-section %} {% endblock %}
+      </div>
+    </div>
+    <script>
+      window.onpageshow = function (event) {
+        if (event.persisted) {
+          window.location.reload();
+        }
+      };
+    </script>
+  </body>
+</html>

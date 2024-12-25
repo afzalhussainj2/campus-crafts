@@ -1,0 +1,30 @@
+{% extends 'basic-login.html' %} {% block form-section %}
+
+<form class="flex-form" style="justify-content: center" method="post" action="{% url 'otp' %}">
+  {% csrf_token %}
+  <style>
+    /*CSS to hide number input spinners */
+    input[type="number"]::-webkit-inner-spin-button,
+    input[type="number"]::-webkit-outer-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+
+    /* Firefox-specific spinner removal */
+    input[type="number"] {
+      -moz-appearance: textfield;
+      appearance: textfield;
+    }
+  </style>
+    <p class="heading" style="margin-bottom: 10px">Enter OTP</p>
+  <label for="otp" style="margin-bottom: 10px">OTP*</label>
+  <input
+    style="margin-bottom: 10px ; "
+    type="number"
+    id="otp"
+    name="otp"
+    required
+  />
+  <button style="margin-bottom: 10px" type="submit">Verify</button>
+</form>
+{% endblock %} 

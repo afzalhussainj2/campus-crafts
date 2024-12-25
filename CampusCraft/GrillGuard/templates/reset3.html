@@ -1,0 +1,28 @@
+{% extends 'basic-login.html' %} {% block form-section %}
+
+<form class="flex-form" style="justify-content: center" method="post" method="post" action="{% url 'savepass' %}">
+  {% csrf_token %}
+  <p class="heading" style="margin-bottom: 10px">Reset your password</p>
+  <p class="msg" style="margin-bottom: 92px">
+    Enter the field below to get started
+  </p>
+  <label for="password" style="margin-bottom: 10px">New password*</label>
+  <input
+    style="margin-bottom: 10px"
+    type="password"
+    id="password"
+    name="password"
+    required
+  />
+  <label for="confirm_password" style="margin-bottom: 10px">Confirm password*</label>
+  <input
+    style="margin-bottom: 10px"
+    type="password"
+    id="confirm_password"
+    name="confirm_password"
+    required
+  />
+  <button style="margin-bottom: 10px" type="submit">Save</button>
+</form>
+
+{% endblock %}

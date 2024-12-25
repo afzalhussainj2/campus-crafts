@@ -1,0 +1,353 @@
+/*  main content */
+
+.table-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  margin-top: 20px;
+  width: 600px;
+}
+
+.search-bar-cont {
+  position: relative;
+  width: 100%;
+  margin-bottom: 20px;
+  height: 28px;
+}
+
+.search-item-icon {
+  position: absolute;
+  top: 50%;
+  left: 10px;
+  transform: translateY(-50%);
+  color: rgba(69, 77, 89, 0.5);
+}
+
+.search-bar {
+  width: 100%;
+  height: 28px;
+  border: none;
+  background: white;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 12px;
+  padding-left: 30px;
+}
+
+.search-bar:focus {
+  outline: none;
+}
+
+.search-bar::placeholder {
+  color: rgba(69, 77, 89, 0.5);
+  font-weight: bold;
+}
+
+.items-table {
+  width: 100%;
+  border-collapse: collapse;
+  border-spacing: 0;
+  overflow-y: auto;
+  height: 76vh;
+  border-bottom: 1px solid #ddd;
+  padding-right: 6px;
+}
+
+.items-table {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(217, 217, 217, 1) #f1f1f1;
+}
+
+.table-head {
+  background-color: white;
+  padding: 10px;
+  margin-bottom: 6px;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  width: 100%;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+  border: 1px solid #ddd;
+  border-radius: 8px;
+}
+
+.items-table-row {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  width: 100%;
+  background-color: white;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  margin-bottom: 2px;
+  height: 28px;
+}
+
+.item-name {
+  font-size: 14px;
+  font-weight: 400;
+  overflow-x: auto;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  width: 120px;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.item-name::-webkit-scrollbar {
+  display: none;
+}
+
+.item-qnt {
+  width: 40px;
+  text-align: center;
+  border: 1px solid rgba(69, 77, 89, 0.5);
+  color: rgba(69, 77, 89, 1);
+  border-radius: 6px;
+  padding: 2px;
+  margin: 0 5px;
+}
+
+.item-qnt::-webkit-outer-spin-button,
+.item-qnt::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.adj-btn {
+  background-color: black;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 2px;
+  padding-left: 4px;
+  padding-right: 4px;
+  cursor: pointer;
+  font-weight: bold;
+  border-radius: 50%;
+  /* border: 2px solid black; */
+  font-size: 14px;
+  text-align: center;
+  text-decoration: none;
+}
+
+.adj-btn:hover {
+  background-color: #f8b602cc;
+}
+
+.item-add-btn-cont {
+  width: 28px;
+}
+
+.item-add-btn {
+  background-color: rgba(22, 192, 152, 0.38);
+  border: 1px solid rgba(0, 176, 135, 1);
+  color: rgba(0, 176, 135, 1);
+  padding: 4px;
+  cursor: pointer;
+  font-size: 12px;
+  text-align: center;
+  text-decoration: none;
+  border-radius: 6px;
+  visibility: hidden;
+  opacity: 0;
+  transition: opacity 0.3s ease-in-out;
+}
+
+.items-table-row:hover .item-add-btn {
+  visibility: visible;
+  opacity: 1;
+}
+
+.right-cont {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  width: 600px;
+  padding: 10px;
+}
+
+.table-waiter {
+  display: flex;
+  justify-content: space-evenly;
+  width: 100%;
+  background-color: white;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+  border: 1px solid #ddd;
+  margin-top: 28px;
+  align-items: center;
+  padding: 10px;
+}
+
+/* .waiter {
+  margin-right: 48px;
+} */
+
+.table {
+  visibility: hidden;
+  opacity: 0;
+}
+
+.waiter {
+  visibility: hidden;
+  opacity: 0;
+}
+
+.waiter-item {
+  margin-top: 4px;
+  font-size: medium;
+  background: rgba(217, 217, 217, 1);
+  border: none;
+  color: black;
+  padding: 2px;
+  border-radius: 6px;
+}
+
+.waiter-item:focus {
+  background: #f8b602cc;
+  color: black;
+  border: none;
+}
+
+.table-item {
+  margin-top: 4px;
+  font-size: medium;
+  background: rgba(217, 217, 217, 1);
+  border: none;
+  color: black;
+  padding: 2px;
+  border-radius: 6px;
+}
+
+.table-item:focus {
+  background: #f8b602cc;
+  color: black;
+  border: none;
+}
+
+.table-waiter-btn {
+  background-color: #f8b602cc;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 10px;
+  cursor: pointer;
+  font-size: 22px;
+  text-align: center;
+  text-decoration: none;
+  width: 100px;
+  margin-bottom: 10px;
+  visibility: hidden;
+  opacity: 0;
+}
+
+.bill {
+  width: 100%;
+  background-color: white;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+  border: 1px solid #ddd;
+  margin-top: 28px;
+  padding: 4px;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(217, 217, 217, 1) #f1f1f1;
+  overflow-y: auto;
+}
+
+.bill-head {
+  display: flex;
+  justify-content: flex-start;
+  padding: 10px;
+  border-bottom: 1px solid #ddd;
+  margin-bottom: 10px;
+}
+
+.bill-details-container {
+  display: flex;
+  flex-direction: column;
+  margin-top: 10px;
+  padding: 10px;
+  border: 1px solid #007bff;
+  border-radius: 5px;
+  background-color: #f9f9f9;
+  width: 500px;
+}
+
+.bill-details-container table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.bill-details-container th,
+.bill-details-container td {
+  text-align: left;
+  padding: 8px;
+  border: 1px solid #ccc;
+}
+
+.bill-details-container th {
+  background-color: #007bff;
+  color: white;
+}
+
+.bill-btn {
+  background-color: #f8b602cc;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 2px;
+  padding-left: 6px;
+  padding-right: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  text-align: center;
+  text-decoration: none;
+}
+
+.bill-btn:hover {
+  background-color: rgba(0, 176, 135, 1);
+}
+
+.bill-container {
+  max-width: 500px;
+  margin: 0 auto;
+  background: #fff;
+  padding: 20px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  border-radius: 10px;
+  position: absolute;
+  top: 25%;
+  left: 40%;
+  display: none;
+}
+h1 {
+  text-align: center;
+  color: #333;
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+}
+table,
+th,
+td {
+  border: 1px solid #ddd;
+}
+th,
+td {
+  text-align: left;
+  padding: 8px;
+}
+th {
+  background-color: #f4f4f4;
+}
+tfoot td {
+  font-weight: bold;
+}
+.total {
+  text-align: right;
+}

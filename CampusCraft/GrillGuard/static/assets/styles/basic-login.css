@@ -1,0 +1,233 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: inherit;
+}
+
+html {
+  margin: 0;
+  padding: 0;
+  font-size: 62.5%;
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: "Roboto", sans-serif;
+  color: #000000;
+  background-color: #ffffff;
+}
+
+.parent {
+  display: flex;
+  height: 100vh;
+  width: 100%;
+}
+@media only screen and (max-width: 900px) {
+  .parent {
+    flex-direction: column;
+  }
+}
+
+.welcome-section {
+  background: #479e90;
+  color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 50%;
+  padding: 0 15px;
+  text-shadow: 0 4px 4px rgba(0, 0, 0, 0.2);
+}
+
+@media only screen and (max-width: 900px) {
+  .welcome-section {
+    width: 100%;
+  }
+}
+
+.welcome-flex {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+  align-items: center;
+}
+
+@media only screen and (max-width: 900px) {
+  .welcome-flex {
+    gap: 0;
+  }
+}
+.welcome-msg {
+  font-family: "Oswald", sans-serif;
+  font-size: 50px;
+  font-weight: 700;
+  line-height: 74px;
+  text-align: center;
+}
+
+@media only screen and (max-width: 900px) {
+  .welcome-msg {
+    font-size: 24px;
+    line-height: 54px;
+  }
+}
+
+.img-cont {
+  width: 350px;
+  height: 350px;
+  /* margin-bottom: 48px; */
+}
+
+@media only screen and (max-width: 900px) {
+  .img-cont {
+    display: none;
+  }
+}
+
+.slogan {
+  font-family: "ribeye", sans-serif;
+  font-size: 28px;
+  font-weight: 400;
+  line-height: 38px;
+  color: #8effff;
+  max-width: 576px;
+  text-align: center;
+}
+
+@media only screen and (max-width: 900px) {
+  .slogan {
+    font-size: 20px;
+    line-height: 32px;
+    text-align: center;
+    margin-bottom: 16px;
+  }
+}
+
+.form-section {
+  color: white;
+  display: flex;
+  justify-content: center;
+  width: 50%;
+  padding: 15px 4%;
+}
+@media only screen and (max-width: 900px) {
+  .form-section {
+    width: 100%;
+    padding: 30px 16px;
+  }
+}
+
+.flex-form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  justify-content: space-evenly;
+  max-width: 600px;
+}
+
+@media only screen and (max-width: 900px) {
+  .flex-form {
+    gap: 12px;
+  }
+}
+.login-msg {
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 18px;
+  color: black;
+  align-self: flex-end;
+}
+@media only screen and (max-width: 900px) {
+  .login-msg {
+    font-size: 12px;
+    line-height: 12px;
+  }
+}
+.login-link {
+  color: #479e90;
+  text-decoration: none;
+  font-weight: 700;
+}
+
+.heading {
+  font-family: "Oswald";
+  font-size: 44px;
+  font-weight: 400;
+  line-height: 60px;
+  text-align: center;
+  color: #000000;
+}
+
+@media only screen and (max-width: 900px) {
+  .heading {
+    font-size: 24px;
+    line-height: 48px;
+  }
+}
+
+.msg {
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 20px;
+  text-align: center;
+  color: rgba(0, 0, 0, 0.45);
+}
+
+label {
+  font-size: 20px;
+  font-weight: 400;
+  line-height: 20px;
+  text-align: left;
+  color: rgba(0, 0, 0, 0.51);
+  align-self: self-start;
+}
+
+@media only screen and (max-width: 900px) {
+  label {
+    font-size: 16px;
+    line-height: 20px;
+  }
+}
+
+input {
+  width: 100%;
+  height: 52px;
+  border-radius: 10px;
+  background-color: #f3f3f3;
+  border: #f3f3f3;
+  padding: 0 16px;
+  font-size: 20px;
+}
+
+@media only screen and (max-width: 900px) {
+  input {
+    height: 38px;
+    padding: 0 12px;
+    font-size: 16px;
+  }
+}
+
+button {
+  width: 100%;
+  height: 62px;
+  border-radius: 10px;
+  font-size: 24px;
+  font-weight: 700;
+  text-align: center;
+  background-color: #ffc107;
+  border: #ffc107;
+  color: #ffffff;
+  margin-top: 12px;
+}
+
+@media only screen and (max-width: 900px) {
+  button {
+    height: 54px;
+    font-size: 20px;
+    margin-top: 14px;
+    margin-top: 4px;
+  }
+}

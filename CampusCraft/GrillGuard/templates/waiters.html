@@ -1,0 +1,251 @@
+{% extends 'sidebar_seller.html' %} {% load static %} {% block style %}<link
+  rel="stylesheet"
+  href="{% static 'assets/styles/dashboard_admin.css' %}"
+/>
+{% endblock %} {% block main-content %}
+
+<!-- main content -->
+<div class="main-content">
+  <div class="table-container" style="width: 90%">
+    <!-- search-bar -->
+    <div class="search-bar-cont">
+      <span class="material-symbols-outlined search-item-icon">search</span>
+      <input
+        type="text"
+        placeholder=" Search"
+        class="search-bar"
+        onkeyup="searchWaiter()"
+      />
+    </div>
+    <!-- table -->
+    <div class="table-head">
+      <h3 style="width: 120px; text-align: center">Waiter</h3>
+      <h3 style="width: 120px; text-align: center">Phone</h3>
+      <h3 style="width: 120px; text-align: center">Tables</h3>
+      <button onclick="newwaiterVisible(this)" class="bill-btn">Add New</button>
+    </div>
+    <div class="items-table" id="itemsTable">
+      {% for waiter in waiters %}
+      <div class="items-table-row">
+        <div class="item-name" style="width: 120px; text-align: center">
+          {{waiter.name}}
+        </div>
+        <div class="item-name" style="width: 120px; text-align: center">
+          {{waiter.phone}}
+        </div>
+        <div class="item-name" style="width: 120px; text-align: center">
+          {{waiter.tables}}
+        </div>
+        <button onclick="removeWaiter(this)" class="bill-btn">Remove</button>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+{% endblock %} {% block bill %}
+
+<div
+  style="
+    max-width: 500px;
+    background: #fff;
+    padding: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    border-radius: 10px;
+    position: absolute;
+    top: 25%;
+    left: 40%;
+    display: none;
+  "
+  class="new_product_container"
+>
+  <input type="text" class="search-bar new_waiter_name" placeholder="Name" />
+  <input type="text" class="search-bar new_waiter_phone" placeholder="Phone" />
+  <input
+    type="number"
+    class="search-bar new_waiter_tables"
+    placeholder="Total Tables"
+    min="0"
+  />
+  <button style="margin-top: 10px" class="bill-btn new_product_btn">
+    Submit
+  </button>
+</div>
+
+{% endblock %} {% block script %}
+<script id="waiters-data" type="application/json">
+  {{ waiter_json|safe }}
+</script>
+
+<script>
+  const waiter = document.querySelector(".waiter-item");
+  const table = document.querySelector(".table-item");
+  let row = null;
+
+  searchWaiter = () => {
+    const input = document.querySelector(".search-bar");
+    const filter = input.value.toUpperCase();
+    const itemsTable = document.getElementById("itemsTable");
+    const waitersDataScript = document.getElementById("waiters-data");
+
+    if (!waitersDataScript || !waitersDataScript.textContent) {
+      return; // Stop execution if no data
+    }
+
+    const waitersData = JSON.parse(waitersDataScript.textContent);
+
+    // Clear the current table content
+    itemsTable.innerHTML = "";
+
+    // Filter waiters based on the search input
+    const filteredWaiters = waitersData.filter((waiter) =>
+      waiter.name.toUpperCase().includes(filter)
+    );
+
+    // Populate the table with filtered waiter data
+    filteredWaiters.forEach((waiter) => {
+      const waiterRow = document.createElement("div");
+      waiterRow.classList.add("items-table-row");
+      waiterRow.innerHTML = `
+      <div class="item-name">${waiter.name}</div>
+      <div class="item-name">${waiter.phone}</div>
+      <div class="item-name">${waiter.tables}</div>
+      <button class="item-price" style="width: 134px">Remove</button>
+    `;
+      itemsTable.appendChild(waiterRow);
+    });
+  };
+
+  function newwaiterVisible(button) {
+    const itemContainer = document.querySelector(".new_product_container");
+
+    // Remove any existing outside click listener to avoid duplicates
+    document.removeEventListener("click", outsideClickListener);
+
+    // Add the outside click listener
+    document.addEventListener("click", outsideClickListener);
+
+    // Define the outside click listener function
+    function outsideClickListener(event) {
+      if (
+        !itemContainer.contains(event.target) &&
+        !button.contains(event.target)
+      ) {
+        itemContainer.style.display = "none";
+        document.removeEventListener("click", outsideClickListener); // Remove the listener after hiding the bill
+      }
+    }
+
+    // Show the bill container
+    itemContainer.style.display = "block";
+  }
+
+  function removeWaiter(button) {
+    // Get the waiter name from the row to be removed
+    const waiterName = button.parentElement
+      .querySelector(".item-name")
+      .textContent.trim();
+
+    // Confirm removal
+    if (!confirm(`Are you sure you want to remove waiter "${waiterName}"?`)) {
+      return;
+    }
+
+    // Send removal request to the backend
+    const csrfTokenElement = document.querySelector(
+      "[name=csrfmiddlewaretoken]"
+    );
+    fetch(`/remove-waiter/`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-CSRFToken": csrfTokenElement.value,
+      },
+      body: JSON.stringify({ name: waiterName }),
+    })
+      .then((response) => {
+        if (response.ok) {
+          // Remove the row from the table
+          const row = button.parentElement;
+          row.parentElement.removeChild(row);
+          alert(`Waiter "${waiterName}" removed successfully.`);
+          window.location.reload();
+        } else {
+          return response.json().then((data) => {
+            throw new Error(data.error || "Failed to remove waiter.");
+          });
+        }
+      })
+      .catch((error) => {
+        console.error(error);
+        alert("An error occurred while removing the waiter.");
+      });
+  }
+
+  document
+    .querySelector(".new_product_btn")
+    .addEventListener("click", function () {
+      const waiterName = document
+        .querySelector(".new_waiter_name")
+        .value.trim();
+    console.log(waiterName);
+      const waiterPhone = document
+        .querySelector(".new_waiter_phone")
+        .value.trim();
+    console.log(waiterPhone);
+      const waiterTables = parseInt(
+        document.querySelector(".new_waiter_tables").value
+      );
+    console.log(waiterTables);
+
+      // Validate the input fields
+      if (!waiterName || !waiterPhone || isNaN(waiterTables)) {
+        alert("Please fill in all fields correctly!");
+        return;
+      }
+
+      // Prepare the data object for the request
+      const data = {
+        name: waiterName,
+        phone: waiterPhone,
+        tables: waiterTables,
+      };
+
+      // CSRF token for the request
+      const csrfTokenElement = document.querySelector(
+        "[name=csrfmiddlewaretoken]"
+      );
+
+      // Send the data to the backend using Fetch
+      fetch("/save-waiter/", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-CSRFToken": csrfTokenElement.value,
+        },
+        body: JSON.stringify(data),
+      })
+        .then((response) => response.json())
+        .then((result) => {
+          if (result.success) {
+            alert(result.message); // Use the message from the backend
+            window.location.reload(); // Reload the page to reflect changes
+          } else {
+            alert("Failed to add waiter: " + result.error || "Unknown error");
+          }
+        })
+        .catch((error) => {
+          console.error("Error adding waiter:", error);
+          alert("An error occurred. Please try again.");
+        });
+
+      // Hide the new waiter form
+      const newWaiterContainer = document.querySelector(
+        ".new_product_container"
+      );
+      newWaiterContainer.style.display = "none";
+    });
+
+
+
+</script>
+{% endblock %}

@@ -1,0 +1,157 @@
+/* Main Content */
+main {
+  flex: 1;
+  padding: 20px;
+}
+
+.complains-header {
+  display: flex;
+  justify-content: space-between;
+  background-color: #ffcc33;
+  padding: 10px 20px;
+  border-radius: 5px;
+  margin-bottom: 20px;
+}
+
+.summary {
+  text-align: center;
+}
+
+.summary h2 {
+  font-size: 24px;
+  color: #333;
+}
+
+.summary p {
+  font-size: 14px;
+  color: #666;
+}
+
+/* Complaints Table */
+.complaints-table {
+  width: 100%;
+  background-color: #fff;
+  border-radius: 5px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.table-header,
+.table-row {
+  display: flex;
+  justify-content: space-between;
+  border-bottom: 1px solid #eee;
+}
+
+.table-header {
+  font-weight: bold;
+  margin-bottom: 10px;
+  gap: 10px;
+}
+
+.table-header-name {
+  background-color: #ffcc33;
+  padding-left: 6px;
+  flex-grow: 1;
+  padding: 10px;
+}
+
+.table-header-status {
+  background-color: #ffcc33;
+  flex-shrink: 0;
+  width: 118px;
+  text-align: center;
+  padding: 10px;
+}
+
+.table-row {
+  cursor: pointer;
+  transition: background-color 0.2s ease-in-out;
+  gap: 10px;
+  margin-bottom: 6px;
+}
+
+.table-row:hover {
+  background-color: #f8f8f8;
+}
+
+.complain-text {
+  padding-left: 6px;
+  flex-grow: 1;
+  background-color: rgb(244, 244, 244);
+  display: flex;
+  align-items: center;
+}
+
+.status {
+  text-align: center;
+}
+
+/* Status Button */
+.status-button {
+  display: inline-block;
+  padding: 2px 4px;
+  font-size: 16px;
+  font-weight: bold;
+  text-align: center;
+  border: 1px solid transparent;
+  width: 120px;
+  height: 40px;
+  line-height: 40px;
+  flex-shrink: 0;
+}
+
+.status-button.approved {
+  background-color: #a0e9a0;
+  color: green;
+  border-color: #6ebf6e;
+}
+
+.status-button.pending {
+  background-color: #ffcccc;
+  color: red;
+  border-color: #e57373;
+}
+
+.status-button.rejected {
+  background-color: #9fa8da;
+  color: blue;
+  border-color: #5c6bc0;
+}
+
+/* Hover Effects */
+.status-button:hover {
+  opacity: 0.8;
+}
+
+/* Pop-up */
+.popup {
+  position: fixed;
+  right: 0;
+  top: 0;
+  width: 30%;
+  height: 100%;
+  background-color: #fff;
+  box-shadow: -2px 0 4px rgba(0, 0, 0, 0.2);
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+  z-index: 1000;
+}
+
+.popup.hidden {
+  display: none;
+}
+
+.popup-content {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+#close-popup {
+  font-size: 18px;
+  cursor: pointer;
+  align-self: flex-end;
+  color: red;
+  font-weight: bold;
+}

@@ -1,0 +1,35 @@
+{% extends 'basic-login.html' %} {% block form-section %}
+
+<!-- Displaying error messages -->
+
+{% if messages %}
+<ul style="color: brown;">
+  {% for message in messages %}
+    <li>
+      {% if message.tags %}{{ message.tags }}:{% endif %} {{ message }}
+    </li>
+  {% endfor %}
+</ul>
+{% endif %}
+
+<form class="flex-form" method="post" action="{% url 'signup' %}">
+  {% csrf_token %}
+  <p class="login-msg">
+    Already have an account?
+    <a class="login-link" href="{% url 'login_page' %}">Log in</a>
+  </p>
+  <p class="heading">Create your account</p>
+  <p class="msg">Enter the field below to get started</p>
+  <label for="name">Name*</label>
+  <input type="text" id="name" name="name" required />
+
+  <label for="email">Email*</label>
+  <input type="email" id="email" name="email" required />
+
+  <label for="password">Password*</label>
+  <input type="password" id="password" name="password" required />
+
+  <button type="submit">Create account</button>
+</form>
+
+{% endblock %}

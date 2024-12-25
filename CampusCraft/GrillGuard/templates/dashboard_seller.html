@@ -1,0 +1,488 @@
+{% extends 'sidebar_seller.html' %} {% load static %} {% block style %}
+<link
+  rel="stylesheet"
+  href="{% static 'assets/styles/dashboard_seller.css' %}"
+/>
+{% endblock %} {% block main-content %}
+<!-- main content -->
+<div class="main-content">
+  <div class="table-container">
+    <!-- search-bar -->
+    <div class="search-bar-cont">
+      <span class="material-symbols-outlined search-item-icon">search</span>
+      <input
+        type="text"
+        placeholder=" Search"
+        class="search-bar"
+        onkeyup="searchTable()"
+      />
+    </div>
+    <!-- table -->
+    <div class="table-head">
+      <h3 style="width: 120px">Items</h3>
+      <h3 style="width: 90px; text-align: center">Quantity</h3>
+      <h3 style="width: 136px">Price</h3>
+      <div style="width: 28px"></div>
+    </div>
+    <div class="items-table" id="itemsTable">
+      {% for item in products %}
+      <div class="items-table-row">
+        <div class="item-name">{{item.name}}</div>
+        <div class="item-qnt-cont">
+          <button class="adj-btn" onclick="decreaseQuantity(this)">-</button>
+          <input min="1" value="1" type="number" class="item-qnt" />
+          <button class="adj-btn" onclick="increaseQuantity(this)">+</button>
+        </div>
+        <div class="item-price" style="width: 134px">Rs.{{item.price}}</div>
+        <div class="item-add-btn-cont">
+          <button onclick="waiterVisible(event)" class="item-add-btn">
+            Add
+          </button>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+  <div class="right-cont">
+    <div class="table-waiter">
+      <div class="waiter">
+        <h4>
+          Waiters
+          <span
+            style="width: 20px; transform: translate(0, -4px)"
+            class="material-symbols-outlined"
+            >man_2</span
+          >
+        </h4>
+        <select class="waiter-item" onchange="tableVisible(), tablechange();">
+          <option value="">Select waiter</option>
+          {% for waiter in waiters %}
+          <option value="{{waiter.name}}">{{waiter.name}}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="table">
+        <h4>
+          Tables
+          <span
+            style="width: 20px; transform: translate(0, -4px)"
+            class="material-symbols-outlined"
+            >table_restaurant</span
+          >
+        </h4>
+        <select class="table-item" onclick="btnVisible()">
+          <option value="">Select Table</option>
+        </select>
+      </div>
+      <button class="table-waiter-btn">OK</button>
+    </div>
+    <div class="bill">
+      <div>
+        <div class="bill-head" style="justify-content: space-evenly">
+          <h3 style="width: 30px">Sr.</h3>
+          <h3 style="width: 94px; text-align: center">Bill no.</h3>
+          <h3 style="width: 90px; text-align: center">Details</h3>
+          <h3 style="width: 138px; text-align: center">Waiter</h3>
+          <h3 style="width: 50px; text-align: center">Table</h3>
+        </div>
+        {% for bill in bills %}
+        <div class="items-table-row" style="justify-content: space-evenly">
+          <div style="width: 30px">{{forloop.counter}}</div>
+          <div style="width: 94px; text-align: center" class="bill-num">
+            {{bill.bill_number}}
+          </div>
+          <button class="bill-btn bill-detail" onclick="billVisible(this)">
+            Show Bill
+          </button>
+          <div
+            class="bill-table-waiter-name"
+            style="width: 138px; text-align: center"
+          >
+            {{bill.waiter}}
+          </div>
+          <div
+            class="bill-table-table-num"
+            style="width: 50px; text-align: center"
+          >
+            {{bill.table}}
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %} {% block bill %}
+<!-- bill -->
+<div class="bill-container">
+  <h1 class="bill-cont-bill-num">bill number</h1>
+  <h3>
+    <span class="bill-cont-waiter-name">waiter</span> (<span
+      class="bill-cont-table-num"
+      >table</span
+    >)
+  </h3>
+  <table>
+    <thead>
+      <tr>
+        <th>Item</th>
+        <th>Quantity</th>
+        <th>Price</th>
+        <th>Total</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr class="bill-row">
+        <td class="bill-item-name">Coke</td>
+        <td class="bill-item-qnt">3</td>
+        <td class="bill-item-price">$2.00</td>
+        <td class="bill-item-price-total">$6.00</td>
+      </tr>
+    </tbody>
+    <tfoot>
+      <tr>
+        <td colspan="3" class="total">Total</td>
+        <td class="totalp">$41.80</td>
+      </tr>
+    </tfoot>
+  </table>
+</div>
+
+{% endblock %} {% block script %}
+<script id="waiters-data" type="application/json">
+  {{ waiter_json|safe }}
+</script>
+<script id="bill-data" type="application/json">
+  {{ bills_json|safe }}
+</script>
+<script id="order-data" type="application/json">
+  {{ orders_json|safe }}
+</script>
+<script id="products-data" type="application/json">
+  {{ products_json|safe }}
+</script>
+
+<script>
+  const waiter = document.querySelector(".waiter-item");
+  const table = document.querySelector(".table-item");
+  let row = null;
+
+  searchTable = () => {
+    const input = document.querySelector(".search-bar");
+    const filter = input.value.toUpperCase();
+    const itemsTable = document.getElementById("itemsTable");
+    const productsDataScript = document.getElementById("products-data");
+
+    // Check if the products data script exists and contains data
+    if (!productsDataScript || !productsDataScript.textContent) {
+      return; // Stop execution if no data
+    }
+
+    const productsData = JSON.parse(productsDataScript.textContent);
+
+    // If search input is empty, reset the table to show all products
+    if (!filter) {
+      itemsTable.innerHTML = "";
+      productsData.forEach((item) => {
+        const itemRow = createTableRow(item);
+        itemsTable.appendChild(itemRow);
+      });
+      return; // Exit the function after resetting the table
+    }
+
+    // Filter the products based on the search input
+    const filteredItems = productsData.filter((product) =>
+      product.name.toUpperCase().includes(filter)
+    );
+
+    // Clear and populate the table with filtered items
+    itemsTable.innerHTML = ""; // Clear the table
+    filteredItems.forEach((item) => {
+      const itemRow = createTableRow(item);
+      itemsTable.appendChild(itemRow);
+    });
+  };
+
+  // Helper function to create a table row
+  function createTableRow(item) {
+    const itemRow = document.createElement("div");
+    itemRow.classList.add("items-table-row");
+    itemRow.innerHTML = `
+    <div class="item-name">${item.name}</div>
+    <div class="item-qnt-cont">
+      <button class="adj-btn" onclick="decreaseQuantity(this)">-</button>
+      <input min="1" value="1" type="number" class="item-qnt" />
+      <button class="adj-btn" onclick="increaseQuantity(this)">+</button>
+    </div>
+    <div class="item-price" style="width: 134px">Rs.${item.price}</div>
+    <div class="item-add-btn-cont">
+      <button onclick="waiterVisible(event)" class="item-add-btn">
+        Add
+      </button>
+    </div>
+  `;
+    return itemRow;
+  }
+
+  function decreaseQuantity(button) {
+    const input = button.parentElement.querySelector("input"); // Get the input field
+    const currentValue = parseInt(input.value); // Parse current value
+    if (currentValue > 1) {
+      input.value = currentValue - 1; // Decrease value
+    }
+  }
+
+  function increaseQuantity(button) {
+    const input = button.parentElement.querySelector("input"); // Get the input field
+    const currentValue = parseInt(input.value); // Parse current value
+    input.value = currentValue + 1; // Increase value
+  }
+
+  function tableVisible() {
+    const table = document.querySelector(".table");
+    const waiter = document.querySelector(".waiter-item");
+    if (waiter.value) {
+      table.style.visibility = "visible";
+      table.style.opacity = "1";
+    }
+  }
+
+  function waiterVisible(event) {
+    const addButton = event.target;
+
+    // Find the row containing the button
+    row = addButton.closest(".items-table-row");
+    const waiter = document.querySelector(".waiter");
+    waiter.style.visibility = "visible";
+    waiter.style.opacity = "1";
+  }
+
+  function btnVisible() {
+    const table = document.querySelector(".table-item");
+    const btn = document.querySelector(".table-waiter-btn");
+    table.style.display = "block";
+    if (table.value) {
+      btn.style.visibility = "visible";
+      btn.style.opacity = "1";
+    }
+  }
+
+  function billVisible(button) {
+    const billNumber =
+      button.parentElement.querySelector(".bill-num").textContent; // Get the bill number
+    const waitername = button.parentElement.querySelector(
+      ".bill-table-waiter-name"
+    ).textContent;
+    const tablenum = button.parentElement.querySelector(
+      ".bill-table-table-num"
+    ).textContent;
+    const billContainer = document.querySelector(".bill-container");
+    const totalElement = document.querySelector(".totalp");
+    const billDataScript = document.getElementById("bill-data");
+    const orderDataScript = document.getElementById("order-data");
+    const productsDataScript = document.getElementById("products-data");
+    const billheadingbillnum = document.querySelector(".bill-cont-bill-num");
+    const billheadingwaitername = document.querySelector(
+      ".bill-cont-waiter-name"
+    );
+    const billheadingtablenum = document.querySelector(".bill-cont-table-num");
+    // Check if the scripts contain the necessary data
+    if (
+      !billDataScript ||
+      !billDataScript.textContent ||
+      !orderDataScript ||
+      !orderDataScript.textContent
+    ) {
+      return; // Stop execution if no data is available
+    }
+
+    billheadingbillnum.textContent = `#${billNumber.trim()}`;
+    billheadingbillnum.style.fontweight = "bold";
+    billheadingwaitername.textContent = waitername;
+    billheadingtablenum.textContent = tablenum;
+
+    // Parse the data from the scripts
+    const billData = JSON.parse(billDataScript.textContent);
+    const orderData = JSON.parse(orderDataScript.textContent);
+    const productsrData = JSON.parse(productsDataScript.textContent);
+    bill = billData.find((bill) => bill.bill_number === billNumber.trim());
+    // Find the bill data by bill number
+    const totalPriceData = bill;
+
+    // Update the total price display
+    totalElement.textContent = `Rs. ${totalPriceData.total}`;
+
+    // Clear any existing items in the bill container
+    const billTableBody = billContainer.querySelector("tbody");
+    billTableBody.innerHTML = ""; // Clear existing rows
+    // Filter orders for this specific bill number
+
+    const ordersForBill = orderData.filter(
+      (order) => order.bill__bill_number === billNumber.trim()
+    );
+    // Loop through orders and create rows for the bill
+    ordersForBill.forEach((order) => {
+      const row = document.createElement("tr");
+      row.classList.add("bill-row");
+
+      // Create table cells for each order item
+      const itemNameCell = document.createElement("td");
+      itemNameCell.classList.add("bill-item-name");
+      itemNameCell.textContent = order.product__name; // Product name from order
+      itemNameCell.style.width = "200px";
+
+      const quantityCell = document.createElement("td");
+      quantityCell.classList.add("bill-item-qnt");
+      quantityCell.textContent = order.quantity; // Quantity from order
+
+      const priceCell = document.createElement("td");
+      priceCell.classList.add("bill-item-price");
+      const itempriceproductobj = productsrData.find(
+        (product) => product.name === order.product__name
+      );
+      priceCell.textContent = `Rs.${itempriceproductobj.price.toFixed(2)}`; // Price of the item
+
+      const totalCell = document.createElement("td");
+      totalCell.classList.add("bill-item-price-total");
+      totalCell.textContent = `Rs.${(
+        itempriceproductobj.price * order.quantity
+      ).toFixed(2)}`; // Total price per product
+
+      // Append the cells to the row
+      row.appendChild(itemNameCell);
+      row.appendChild(quantityCell);
+      row.appendChild(priceCell);
+      row.appendChild(totalCell);
+
+      // Append the row to the bill table body
+      billTableBody.appendChild(row);
+
+      // Remove any existing outside click listener to avoid duplicates
+      document.removeEventListener("click", outsideClickListener);
+
+      // Add the outside click listener
+      document.addEventListener("click", outsideClickListener);
+
+      // Define the outside click listener function
+      function outsideClickListener(event) {
+        if (
+          !billContainer.contains(event.target) &&
+          !button.contains(event.target)
+        ) {
+          billContainer.style.display = "none";
+          document.removeEventListener("click", outsideClickListener); // Remove the listener after hiding the bill
+        }
+      }
+    });
+
+    // Show the bill container
+    billContainer.style.display = "block";
+  }
+
+  function tablechange() {
+    const waiterSelect = document.querySelector(".waiter-item");
+    const tableSelect = document.querySelector(".table-item");
+    const waitersDataScript = document.getElementById("waiters-data");
+
+    if (!waitersDataScript || !waitersDataScript.textContent) {
+      return; // Stop execution if no data
+    }
+
+    const waitersData = JSON.parse(waitersDataScript.textContent);
+
+    // Clear existing options
+    tableSelect.innerHTML = '<option value="">Select Table</option>'; // Ensure to reset options
+
+    // Get the selected waiter object
+    const selectedWaiter = waitersData.find(
+      (waiter) => waiter.name === waiterSelect.value
+    );
+
+    if (selectedWaiter) {
+      // Add options dynamically based on the selected waiter's available tables
+      for (let i = 1; i <= selectedWaiter.tables; i++) {
+        const option = document.createElement("option");
+        option.value = i;
+        option.text = `Table ${i}`;
+        tableSelect.appendChild(option); // Append the new table option
+      }
+    }
+  }
+
+  document
+    .querySelector(".table-waiter-btn")
+    .addEventListener("click", function () {
+      // Get the product name
+      const productName = row.querySelector(".item-name").textContent;
+
+      // Get the quantity
+      const quantity = parseInt(row.querySelector(".item-qnt").value);
+
+      // Get the waiter name
+      const waiterSelect = document.querySelector(".waiter-item");
+      const waiterName = waiterSelect.value;
+
+      // Get the table number
+      const tableSelect = document.querySelector(".table-item");
+      if (!tableSelect) {
+        return;
+      }
+      const tableNumber = parseInt(tableSelect.value);
+
+      // Get the product price
+      const productPrice = parseFloat(
+        row.querySelector(".item-price").textContent.replace("Rs.", "").trim()
+      );
+
+      // If any of the fields are missing, alert the user
+      if (!productName || !quantity || !waiterName || !tableNumber) {
+        alert("Please select all fields!");
+        return;
+      }
+
+      // Prepare the data object for the request
+      const data = {
+        product: productName,
+        quantity: quantity,
+        waiter: waiterName,
+        table: tableNumber,
+        total_price: productPrice * quantity,
+      };
+
+      csrfTokenElement = document.querySelector("[name=csrfmiddlewaretoken]");
+
+      // Send the data to the backend using Fetch
+      fetch("/save-order/", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-CSRFToken": csrfTokenElement.value,
+        },
+        body: JSON.stringify(data),
+      })
+        .then((response) => response.json())
+        .then((result) => {
+          if (result.success) {
+            alert("Order saved successfully!");
+          } else {
+            alert("Failed to save order!");
+          }
+        });
+
+      // Hide content after successful submission
+      const table = document.querySelector(".table");
+      table.style.visibility = "hidden";
+      table.style.opacity = "0";
+
+      const waiter = document.querySelector(".waiter");
+      waiter.style.visibility = "hidden";
+      waiter.style.opacity = "0";
+
+      const btn = document.querySelector(".table-waiter-btn");
+      btn.style.visibility = "hidden";
+      btn.style.opacity = "0";
+
+      window.location.reload();
+    });
+</script>
+{% endblock %}

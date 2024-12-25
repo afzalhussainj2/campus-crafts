@@ -1,0 +1,271 @@
+{% extends 'sidebar_admin.html' %} {% load static %} {% block style %}<link
+  rel="stylesheet"
+  href="{% static 'assets/styles/sellers.css' %}"
+/>
+{% endblock %} {% block main-content %}
+
+<!-- main content -->
+<div class="main-content">
+  <div class="table-container" style="width: 90%">
+    <!-- search-bar -->
+    <div class="search-bar-cont">
+      <span class="material-symbols-outlined search-item-icon">search</span>
+      <input
+        type="text"
+        placeholder=" Search"
+        class="search-bar"
+        onkeyup="searchSeller()"
+      />
+    </div>
+    <!-- table -->
+    <div class="table-head">
+      <h3 style="width: 120px; text-align: center">Seller</h3>
+      <h3 style="width: 120px; text-align: center">Email</h3>
+      <h3 style="width: 120px; text-align: center">Phone</h3>
+      <h3 style="width: 120px; text-align: center">Status</h3>
+      <button onclick="newsellerVisible(this)" class="bill-btn">Add New</button>
+    </div>
+    <div class="items-table" id="itemsTable">
+      {% for seller in sellers %}
+      <div class="items-table-row">
+        <div class="item-name" style="width: 120px; text-align: center">
+          {{seller.name}}
+        </div>
+        <div
+          class="item-name item-email"
+          style="width: 120px; text-align: center"
+        >
+          {{seller.email}}
+        </div>
+        <div class="item-name" style="width: 120px; text-align: center">
+          {{seller.phone}}
+        </div>
+        <div class="item-name" style="width: 120px; text-align: center">
+          {% if seller.is_active %} Active {% else %} Not Active {% endif %}
+        </div>
+        <button onclick="removeSeller(this)" class="bill-btn">Remove</button>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+{% endblock %} {% block bill %}
+
+<div
+  style="
+    max-width: 500px;
+    background: #fff;
+    padding: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    border-radius: 10px;
+    position: absolute;
+    top: 25%;
+    left: 40%;
+    display: none;
+  "
+  class="new_seller_container"
+>
+  <input type="text" class="search-bar new_seller_name" placeholder="Name" />
+  <input type="text" class="search-bar new_seller_email" placeholder="Email" />
+  <input type="text" class="search-bar new_seller_phone" placeholder="Phone" />
+  <input
+    type="text"
+    class="search-bar new_seller_password"
+    placeholder="Password"
+  />
+  <button style="margin-top: 10px" class="bill-btn new_seller_btn">
+    Submit
+  </button>
+</div>
+
+{% endblock %} {% block script %}
+<script id="seller-data" type="application/json">
+  {{ seller_json|safe }}
+</script>
+
+<script>
+  const waiter = document.querySelector(".waiter-item");
+  const table = document.querySelector(".table-item");
+  let row = null;
+
+  searchSeller = () => {
+    const input = document.querySelector(".search-bar");
+    const filter = input.value.toUpperCase();
+    const itemsTable = document.getElementById("itemsTable");
+    const sellersDataScript = document.getElementById("seller-data");
+
+    if (!sellersDataScript || !sellersDataScript.textContent) {
+      return; // Stop execution if no data
+    }
+
+    const sellersData = JSON.parse(sellersDataScript.textContent);
+
+    // Clear the current table content
+    itemsTable.innerHTML = "";
+
+    // Filter waiters based on the search input
+    const filteredSellers = sellersData.filter((seller) =>
+      seller.name.toUpperCase().includes(filter)
+    );
+
+    // Populate the table with filtered waiter data
+    filteredSellers.forEach((seller) => {
+      const sellerRow = document.createElement("div");
+      sellerRow.classList.add("items-table-row");
+      sellerRow.innerHTML = `
+      <div class="item-name" style="width: 120px; text-align: center">
+          ${seller.name}
+        </div>
+        <div
+          class="item-name item-email"
+          style="width: 120px; text-align: center"
+        >
+          ${seller.email}
+        </div>
+        <div class="item-name" style="width: 120px; text-align: center">
+          ${seller.phone}
+        </div>
+        <div class="item-name" style="width: 120px; text-align: center">
+          ${seller.status}
+        </div>
+        <button onclick="removeSeller(this)" class="bill-btn">Remove</button>
+      `;
+      itemsTable.appendChild(sellerRow);
+    });
+  };
+
+  function newsellerVisible(button) {
+    const itemContainer = document.querySelector(".new_seller_container");
+
+    // Remove any existing outside click listener to avoid duplicates
+    document.removeEventListener("click", outsideClickListener);
+
+    // Add the outside click listener
+    document.addEventListener("click", outsideClickListener);
+
+    // Define the outside click listener function
+    function outsideClickListener(event) {
+      if (
+        !itemContainer.contains(event.target) &&
+        !button.contains(event.target)
+      ) {
+        itemContainer.style.display = "none";
+        document.removeEventListener("click", outsideClickListener); // Remove the listener after hiding the bill
+      }
+    }
+
+    // Show the bill container
+    itemContainer.style.display = "block";
+  }
+
+  function removeSeller(button) {
+    // Get the waiter name from the row to be removed
+    const sellerEmail = button.parentElement
+      .querySelector(".item-email")
+      .textContent.trim();
+
+    // Confirm removal
+    if (!confirm(`Are you sure you want to remove waiter "${sellerEmail}"?`)) {
+      return;
+    }
+
+    // Send removal request to the backend
+    const csrfTokenElement = document.querySelector(
+      "[name=csrfmiddlewaretoken]"
+    );
+    fetch(`/remove-seller/`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-CSRFToken": csrfTokenElement.value,
+      },
+      body: JSON.stringify({ email: sellerEmail }),
+    })
+      .then((response) => {
+        if (response.ok) {
+          // Remove the row from the table
+          const row = button.parentElement;
+          row.parentElement.removeChild(row);
+          alert(`Srller "${sellerEmail}" removed successfully.`);
+          window.location.reload();
+        } else {
+          return response.json().then((data) => {
+            throw new Error(data.error || "Failed to remove seller.");
+          });
+        }
+      })
+      .catch((error) => {
+        console.error(error);
+        alert("An error occurred while removing the seller.");
+      });
+  }
+
+  document
+    .querySelector(".new_seller_btn")
+    .addEventListener("click", function () {
+      console.log("clicked");
+      const sellerName = document
+        .querySelector(".new_seller_name")
+        .value.trim();
+      console.log(sellerName);
+      const sellerPhone = document
+        .querySelector(".new_seller_phone")
+        .value.trim();
+      console.log(sellerPhone);
+      const sellerEmail = document.querySelector(".new_seller_email").value;
+      console.log("email", sellerEmail);
+      const sellerPassword = document.querySelector(
+        ".new_seller_password"
+      ).value;
+      console.log(sellerPassword);
+
+      // Validate the input fields
+      if (!sellerName || !sellerEmail || !sellerPhone || !sellerPassword) {
+        alert("Please fill in all fields correctly!");
+        return;
+      }
+
+      // Prepare the data object for the request
+      const data = {
+        name: sellerName,
+        phone: sellerPhone,
+        email: sellerEmail,
+        password: sellerPassword,
+      };
+
+      // CSRF token for the request
+      const csrfTokenElement = document.querySelector(
+        "[name=csrfmiddlewaretoken]"
+      );
+
+      // Send the data to the backend using Fetch
+      fetch("/save-seller/", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-CSRFToken": csrfTokenElement.value,
+        },
+        body: JSON.stringify(data),
+      })
+        .then((response) => response.json())
+        .then((result) => {
+          if (result.success) {
+            alert(result.message); // Use the message from the backend
+            window.location.reload(); // Reload the page to reflect changes
+          } else {
+            alert("Failed to add seller: " + result.error || "Unknown error");
+          }
+        })
+        .catch((error) => {
+          console.error("Error adding seller:", error);
+          alert("An error occurred. Please try again.");
+        });
+
+      // Hide the new seller form
+      const newWaiterContainer = document.querySelector(
+        ".new_seller_container"
+      );
+      newsellerContainer.style.display = "none";
+    });
+</script>
+{% endblock %}
